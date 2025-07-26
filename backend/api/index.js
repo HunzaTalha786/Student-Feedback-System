@@ -13,21 +13,27 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-app.use("/feedback", feedbackRoutes);
-app.use("/admin", adminRoutes);
+// Routes
+app.use("/api/feedback", feedbackRoutes);
+app.use("/api/admin", adminRoutes);
 
 app.get("/", (req, res) => {
-  res.send("Student Feedback API is running");
+  res.send("Student Feedback API is running (Vercel)");
 });
 
+let isConnected = false;
 
-mongoose.connect(process.env.MONGO_URI)
-  .then(() => {
-    console.log("MongoDB Connected");
-    // app.listen(process.env.PORT, () =>
-    //   console.log(`Server running on http://localhost:${process.env.PORT}`)
-    // );
-  })
-  .catch((err) => console.log(err));
+async function connectDB() {
+  if (!isConnected) {
+    await mongoose.connect(process.env.MONGO_URI, {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+    });
+    isConnected = true;
+    console.log("✅ MongoDB Connected");
+  }
+}
 
-  export default serverless(app);
+await connectDB();
+
+export default serverless(app);
